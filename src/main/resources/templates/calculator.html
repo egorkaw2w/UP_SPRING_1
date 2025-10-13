@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Простой калькулятор</title>
+</head>
+<body>
+<header>
+    <a href="/converter">Конвертер</a>
+</header>
+<div class="calculator">
+    <form th:action="@{/calculator}" method="post">
+        <input type="text" name="expression" th:value="${expression}" readonly />
+        <div>
+            <button type="submit" name="action" value="7">7</button>
+            <button type="submit" name="action" value="8">8</button>
+            <button type="submit" name="action" value="9">9</button>
+            <button type="submit" name="action" value="/">/</button>
+            <button type="submit" name="action" value="backspace">←</button>
+        </div>
+        <div>
+            <button type="submit" name="action" value="4">4</button>
+            <button type="submit" name="action" value="5">5</button>
+            <button type="submit" name="action" value="6">6</button>
+            <button type="submit" name="action" value="*">*</button>
+        </div>
+        <div>
+            <button type="submit" name="action" value="1">1</button>
+            <button type="submit" name="action" value="2">2</button>
+            <button type="submit" name="action" value="3">3</button>
+            <button type="submit" name="action" value="-">-</button>
+        </div>
+        <div>
+            <button type="submit" name="action" value="0">0</button>
+            <button type="submit" name="action" value=".">.</button>
+            <button type="submit" name="action" value="clear">C</button>
+            <button type="submit" name="action" value="+">+</button>
+            <button type="submit" name="action" value="equals">=</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
