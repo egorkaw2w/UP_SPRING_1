@@ -1,0 +1,213 @@
+/* Общий стиль */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Формы */
+.form-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group input, .form-group select, .form-group button {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-group input[type="text"], .form-group input[type="number"], .form-group select {
+    flex: 1;
+    min-width: 150px;
+}
+
+.form-group button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.form-group button:hover {
+    background-color: #2980b9;
+}
+
+/* Таблица */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Чекбоксы */
+input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Кнопки действий */
+.btn {
+    padding: 6px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-delete {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+.btn-logical {
+    background-color: #f39c12;
+    color: white;
+}
+
+.btn-logical:hover {
+    background-color: #e67e22;
+}
+
+.btn-restore {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-restore:hover {
+    background-color: #219653;
+}
+
+.btn-add {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.btn-add:hover {
+    background-color: #219653;
+}
+
+.btn-mass {
+    margin-top: 15px;
+    padding: 10px 15px;
+    font-weight: bold;
+}
+
+/* Удалённые */
+.deleted {
+    color: #95a5a6;
+    font-style: italic;
+}
+
+.deleted td {
+    opacity: 0.7;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+}
+.deleted-row {
+    background-color: #ffe6e6 !important;
+    color: #999;
+    text-decoration: line-through;
+}
+.deleted-row {
+    background-color: #ffe6e6 !important;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.bulk-actions {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.btn-logical-mass {
+    background: #f39c12;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-delete-mass {
+    background: #e74c3c;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Навигация */
+.nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+.nav a {
+    color: #2c3e50;
+    text-decoration: none;
+    background: #f0f2f5;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+.nav a:hover {
+    background: #e6eaf0;
+}

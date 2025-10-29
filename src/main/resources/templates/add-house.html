@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Добавить дом</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <a th:href="@{/}" sec:authorize="isAuthenticated()">Главная</a>
+        <a th:href="@{/houses}" sec:authorize="isAuthenticated()">Дома</a>
+        <a th:href="@{/persons}" sec:authorize="hasAnyRole('MANAGER','ADMIN')">Люди</a>
+        <a th:href="@{/cities}" sec:authorize="hasAnyRole('MANAGER','ADMIN')">Города</a>
+        <a th:href="@{/notes}" sec:authorize="hasRole('ADMIN')">Заметки</a>
+        <a th:href="@{/ownerships}" sec:authorize="hasRole('ADMIN')">Владения</a>
+        <span style="float:right">
+          <a th:href="@{/register}" sec:authorize="isAnonymous()">Регистрация</a>
+          <a th:href="@{/login}" sec:authorize="isAnonymous()">Войти</a>
+          <span sec:authorize="isAuthenticated()">
+            <span th:text="${#authentication?.name}"></span>
+            &nbsp;|&nbsp;
+            <a th:href="@{/logout}">Выйти</a>
+          </span>
+        </span>
+      </div>
+
+      <h1>Добавить дом</h1>
+
+      <form th:action="@{/houses/add}" th:object="${house}" method="post">
+        <div class="form-group" style="flex-direction: column; gap: 15px">
+          <div>
+            <label
+              >Адрес: <input th:field="*{address}" style="width: 400px"
+            /></label>
+            <span
+              th:if="${#fields.hasErrors('address')}"
+              th:errors="*{address}"
+              class="error"
+            ></span>
+          </div>
+          <div>
+            <label
+              >Площадь (м²): <input th:field="*{size}" style="width: 120px"
+            /></label>
+            <span
+              th:if="${#fields.hasErrors('size')}"
+              th:errors="*{size}"
+              class="error"
+            ></span>
+          </div>
+          <div>
+            <label
+              >Город:
+              <select th:field="*{cityId}" style="width: 250px">
+                <option th:value="${null}">— не выбран —</option>
+                <option
+                  th:each="c : ${cities}"
+                  th:value="${c.id}"
+                  th:text="${c.name}"
+                ></option>
+              </select>
+            </label>
+          </div>
+          <div>
+            <button type="submit">Сохранить</button>
+            <a
+              th:href="@{/houses}"
+              style="margin-left: 10px; color: #3498db; text-decoration: none"
+              >Назад</a
+            >
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

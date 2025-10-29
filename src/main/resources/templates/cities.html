@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Города</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <a th:href="@{/houses}" sec:authorize="isAuthenticated()">Дома</a>
+        <a th:href="@{/persons}" sec:authorize="hasAnyRole('MANAGER','ADMIN')">Люди</a>
+        <a th:href="@{/cities}" sec:authorize="hasAnyRole('MANAGER','ADMIN')">Города</a>
+        <a th:href="@{/notes}" sec:authorize="hasRole('ADMIN')">Заметки</a>
+        <a th:href="@{/ownerships}" sec:authorize="hasRole('ADMIN')">Владения</a>
+        <span style="float:right;">
+          <a th:href="@{/register}" sec:authorize="isAnonymous()">Регистрация</a>
+          <a th:href="@{/login}" sec:authorize="isAnonymous()">Вход</a>
+          <span sec:authorize="isAuthenticated()">
+            <span th:text="${#authentication?.name}"></span>
+            &nbsp;|&nbsp;
+            <a th:href="@{/logout}">Выйти</a>
+          </span>
+        </span>
+      </div>
+      <h1>Список городов</h1>
+
+      <div th:if="${message}" class="alert success" th:text="${message}"></div>
+      <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="c : ${cities}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.name}"></td>
+            <td>
+              <form
+                method="post"
+                th:action="@{/cities/delete/{id}(id=${c.id})}"
+              >
+                <button type="submit" class="btn-delete">Удалить</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <a th:href="@{/cities/add}" class="btn-add">Добавить город</a>
+    </div>
+  </body>
+</html>
