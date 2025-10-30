@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Person;
 import com.example.demo.service.PersonService;
-import com.example.demo.service.CityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,6 @@ import java.util.List;
 public class PersonController {
 
     private final PersonService personService;
-    private final CityService cityService;
 
     @GetMapping
     public String listPersons(
@@ -35,7 +33,6 @@ public class PersonController {
     @GetMapping("/add")
     public String addPersonForm(Model model) {
         model.addAttribute("person", new Person());
-        model.addAttribute("cities", cityService.getAll());
         return "add-person";
     }
 
@@ -58,13 +55,8 @@ public class PersonController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deletePerson(@PathVariable Long id, RedirectAttributes ra) {
-        try {
-            personService.delete(id);
-            ra.addFlashAttribute("message", "Человек удалён");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", e.getMessage());
-        }
+    public String deletePerson(@PathVariable Long id) {
+        personService.delete(id);
         return "redirect:/persons";
     }
 
@@ -101,12 +93,8 @@ public class PersonController {
         if (ids == null || ids.isEmpty()) {
             ra.addFlashAttribute("error", "Выберите хотя бы одну запись!");
         } else {
-            int ok = 0; int fail = 0;
-            for (Long id : ids) {
-                try { personService.delete(id); ok++; } catch (Exception e) { fail++; }
-            }
-            if (ok > 0) ra.addFlashAttribute("message", "Удалено: " + ok);
-            if (fail > 0) ra.addFlashAttribute("error", "Не удалено из-за связей: " + fail);
+            personService.deleteAll(ids);
+            ra.addFlashAttribute("message", "Физически удалено: " + ids.size());
         }
         return "redirect:/persons";
     }

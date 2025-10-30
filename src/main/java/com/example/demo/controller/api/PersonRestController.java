@@ -38,8 +38,9 @@ public class PersonRestController {
     public Person update(@PathVariable Long id, @Valid @RequestBody Person p) {
         Person existing = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Человек не найден: " + id));
         existing.setName(p.getName());
-        existing.setEmail(p.getEmail());
-        existing.setPhone(p.getPhone());
+        existing.setAge(p.getAge());
+        existing.setCity(p.getCity());
+        existing.setGender(p.getGender());
         return personRepository.save(existing);
     }
 

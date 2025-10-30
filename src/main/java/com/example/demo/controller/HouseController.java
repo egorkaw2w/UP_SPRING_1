@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.House;
 import com.example.demo.service.HouseService;
-import com.example.demo.service.CityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,6 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService houseService;
-    private final CityService cityService;
 
     @GetMapping
     public String listHouses(
@@ -35,7 +33,6 @@ public class HouseController {
     @GetMapping("/add")
     public String addHouseForm(Model model) {
         model.addAttribute("house", new House());
-        model.addAttribute("cities", cityService.getAll());
         return "add-house";
     }
 
@@ -59,13 +56,8 @@ public class HouseController {
 
     // ФИЗИЧЕСКОЕ УДАЛЕНИЕ (ОДНА ЗАПИСЬ)
     @PostMapping("/delete/{id}")
-    public String deleteHouse(@PathVariable Long id, RedirectAttributes ra) {
-        try {
-            houseService.delete(id);
-            ra.addFlashAttribute("message", "Дом удалён");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", e.getMessage());
-        }
+    public String deleteHouse(@PathVariable Long id) {
+        houseService.delete(id);
         return "redirect:/houses";
     }
 
@@ -106,12 +98,8 @@ public class HouseController {
         if (ids == null || ids.isEmpty()) {
             ra.addFlashAttribute("error", "Выберите хотя бы одну запись!");
         } else {
-            int ok = 0; int fail = 0;
-            for (Long id : ids) {
-                try { houseService.delete(id); ok++; } catch (Exception e) { fail++; }
-            }
-            if (ok > 0) ra.addFlashAttribute("message", "Удалено: " + ok);
-            if (fail > 0) ra.addFlashAttribute("error", "Не удалено из-за связей: " + fail);
+            houseService.deleteAll(ids);
+            ra.addFlashAttribute("message", "Физически удалено: " + ids.size());
         }
         return "redirect:/houses";
     }

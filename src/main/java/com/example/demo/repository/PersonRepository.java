@@ -1,9 +1,23 @@
 package com.example.demo.repository;
 
 import com.example.demo.model.Person;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import java.util.List;
+import java.util.Optional;
 
-public interface PersonRepository extends JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
-    long countByCityId(Long cityId);
+public interface PersonRepository {
+    List<Person> findAll(boolean includeDeleted);
+    default List<Person> findAll() {
+        return findAll(false);
+    }
+    Optional<Person> findById(Long id);
+    Person save(Person person);
+    void deleteById(Long id);
+    default void delete(Person person) {
+        if (person != null && person.getId() != null) {
+            deleteById(person.getId());
+        }
+    }
+    void logicalDeleteById(Long id);
+    void deleteMultiple(List<Long> ids);
+    void logicalDeleteMultiple(List<Long> ids);
 }

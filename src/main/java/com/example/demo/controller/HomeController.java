@@ -23,11 +23,11 @@ public class HomeController {
         if (isManager) {
             return "redirect:/persons";
         }
-        // If admin -> cities (admin can see everything)
+        // If admin -> houses (admin can see everything)
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) {
-            return "redirect:/cities";
+            return "redirect:/houses";
         }
         // Fallback
         return "redirect:/houses";

@@ -21,8 +21,16 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() -> roleRepository.save(new Role(null, "ROLE_ADMIN")));
-        Role managerRole = roleRepository.findByName("ROLE_MANAGER").orElseGet(() -> roleRepository.save(new Role(null, "ROLE_MANAGER")));
+        Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() -> {
+            Role r = new Role();
+            r.setName("ROLE_ADMIN");
+            return roleRepository.save(r);
+        });
+        Role managerRole = roleRepository.findByName("ROLE_MANAGER").orElseGet(() -> {
+            Role r = new Role();
+            r.setName("ROLE_MANAGER");
+            return roleRepository.save(r);
+        });
 
         if (!userRepository.existsByUsername("admin")) {
             User admin = new User();
@@ -50,7 +58,11 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (!userRepository.existsByUsername("user")) {
-            Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() -> roleRepository.save(new Role(null, "ROLE_USER")));
+            Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() -> {
+                Role r = new Role();
+                r.setName("ROLE_USER");
+                return roleRepository.save(r);
+            });
             User user = new User();
             user.setUsername("user");
             user.setPassword(passwordEncoder.encode("userPass123!"));

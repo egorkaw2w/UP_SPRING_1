@@ -1,72 +1,73 @@
 package com.example.demo.service;
 
 import com.example.demo.model.House;
-import com.example.demo.repository.HouseRepository;
-import com.example.demo.repository.CityRepository;
-import com.example.demo.repository.OwnershipRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class HouseService {
 
-    private final HouseRepository houseRepository;
-    private final OwnershipRepository ownershipRepository;
-    private final CityRepository cityRepository;
+    private final List<House> houses = new ArrayList<>();
+    private Long nextId = 1L;
 
     public List<House> getAll(String addressFilter, Double minSize, String sortBy) {
-        Specification<House> spec = (root, q, cb) -> cb.conjunction();
-        if (addressFilter != null && !addressFilter.isBlank()) {
-            spec = spec.and((root, q, cb) -> cb.like(cb.lower(root.get("address")), "%" + addressFilter.toLowerCase() + "%"));
-        }
-        if (minSize != null) {
-            spec = spec.and((root, q, cb) -> cb.ge(root.get("size"), minSize));
-        }
+        var filtered = houses.stream()
+                .filter(h -> addressFilter == null || h.getAddress().toLowerCase().contains(addressFilter.toLowerCase()))
+                .filter(h -> minSize == null || h.getSize() >= minSize)
+                .collect(Collectors.toList());
 
-        Sort sort = Sort.unsorted();
-        if (sortBy != null && !sortBy.isBlank()) {
-            sort = switch (sortBy) {
-                case "address" -> Sort.by("address");
-                case "size" -> Sort.by("size");
-                default -> Sort.unsorted();
-            };
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "address" -> filtered.sort((a, b) -> a.getAddress().compareToIgnoreCase(b.getAddress()));
+                case "size" -> filtered.sort((a, b) -> Double.compare(a.getSize(), b.getSize()));
+            }
         }
-        return houseRepository.findAll(spec, sort);
+        return filtered;
     }
 
     public void save(House house) {
-        if (house.getCityId() != null) {
-            house.setCity(cityRepository.findById(house.getCityId()).orElse(null));
+        if (house.getId() == null) {
+            house.setId(nextId++);
+            houses.add(house);
+        } else {
+            update(house);
         }
-        houseRepository.save(house);
     }
 
     public void update(House house) {
-        houseRepository.save(house);
+        House existing = houses.stream()
+                .filter(h -> h.getId().equals(house.getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Дом не найден"));
+        existing.setAddress(house.getAddress());
+        existing.setSize(house.getSize());
     }
 
     public void delete(Long id) {
-        if (ownershipRepository.countByHouseId(id) > 0) {
-            throw new IllegalStateException("Нельзя удалить: дом связан с владельцами");
-        }
-        houseRepository.deleteById(id);
+        House house = houses.stream()
+                .filter(h -> h.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Дом не найден"));
+        houses.remove(house);
     }
 
     public void logicalDelete(Long id) {
-        House h = houseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Дом не найден"));
-        h.setDeleted(true);
-        houseRepository.save(h);
+        House house = houses.stream()
+                .filter(h -> h.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Дом не найден"));
+        house.setDeleted(true);
     }
 
     public void restore(Long id) {
-        House h = houseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Дом не найден"));
-        h.setDeleted(false);
-        houseRepository.save(h);
+        House house = houses.stream()
+                .filter(h -> h.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Дом не найден"));
+        house.setDeleted(false);
     }
 
     public void logicalDeleteAll(List<Long> ids) {
