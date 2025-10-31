@@ -40,7 +40,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setEnabled(true);
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
-            roles.add(managerRole);
+            // Админ имеет только ROLE_ADMIN, без ROLE_MANAGER
             admin.setRoles(roles);
             userRepository.save(admin);
         }

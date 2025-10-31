@@ -1,16 +1,53 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
     <meta charset="UTF-8" />
     <title>Ошибка</title>
     <link th:href="@{/css/style.css}" rel="stylesheet" />
-</head>
-<body>
-<div class="container">
-    <h1>Произошла ошибка</h1>
-    <p th:text="${message}">Что-то пошло не так.</p>
-    <p><a th:href="@{/}">Вернуться на главную</a></p>
-</div>
-</body>
-</html>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <a th:href="@{/persons}" sec:authorize="hasRole('USER')">Люди</a>
+        <a th:href="@{/cities}" sec:authorize="hasRole('MANAGER')">Города</a>
+        <a th:href="@{/houses}" sec:authorize="hasRole('ADMIN')">Дома</a>
+        <span style="float: right">
+          <a th:href="@{/login}" sec:authorize="isAnonymous()">Войти</a>
+          <span sec:authorize="isAuthenticated()">
+            <span th:text="${#authentication?.name}"></span>
+            &nbsp;|&nbsp;
+            <a th:href="@{/logout}">Выйти</a>
+          </span>
+        </span>
+      </div>
 
+      <h1>Произошла ошибка</h1>
+      <div class="alert error">
+        <p>
+          <strong>Код ошибки:</strong>
+          <span th:text="${status}">Неизвестный</span>
+        </p>
+        <p>
+          <strong>Описание:</strong>
+          <span th:text="${message}">Что-то пошло не так.</span>
+        </p>
+        <p th:if="${exception}" style="font-size: 0.9em; color: #666">
+          <strong>Тип ошибки:</strong> <span th:text="${exception}"></span>
+        </p>
+      </div>
+      <p>
+        <a th:href="@{/}" class="btn-add">Вернуться на главную</a>
+        <a
+          th:href="@{/login}"
+          sec:authorize="isAnonymous()"
+          class="btn-add"
+          style="margin-left: 10px"
+          >Войти</a
+        >
+      </p>
+    </div>
+  </body>
+</html>

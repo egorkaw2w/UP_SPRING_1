@@ -22,9 +22,20 @@ public class AppErrorController implements ErrorController {
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
         ServletWebRequest webRequest = new ServletWebRequest(request);
-        Map<String, Object> attrs = errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE));
+        Map<String, Object> attrs = errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.of(
+                ErrorAttributeOptions.Include.MESSAGE,
+                ErrorAttributeOptions.Include.STATUS,
+                ErrorAttributeOptions.Include.EXCEPTION
+        ));
+        
+        Object status = attrs.get("status");
         Object message = attrs.get("message");
+        Object exception = attrs.get("exception");
+        
+        model.addAttribute("status", status != null ? status : "Неизвестный");
         model.addAttribute("message", message != null ? message : "Произошла неизвестная ошибка");
+        model.addAttribute("exception", exception);
+        
         return "error";
     }
 }

@@ -1,20 +1,21 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Person;
+import com.example.demo.repository.PersonRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PersonService {
-
-    private final List<Person> persons = new ArrayList<>();
-    private Long nextId = 1L;
+    private final PersonRepository personRepository;
 
     public List<Person> getAll(String nameFilter, Integer minAge, String sortBy) {
-        var filtered = persons.stream()
+        var filtered = personRepository.findAll().stream()
                 .filter(p -> nameFilter == null || p.getName().toLowerCase().contains(nameFilter.toLowerCase()))
                 .filter(p -> minAge == null || p.getAge() >= minAge)
                 .collect(Collectors.toList());
@@ -23,62 +24,67 @@ public class PersonService {
             switch (sortBy) {
                 case "name" -> filtered.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
                 case "age" -> filtered.sort((a, b) -> Integer.compare(a.getAge(), b.getAge()));
-                case "city" -> filtered.sort((a, b) -> a.getCity().compareToIgnoreCase(b.getCity()));
+                case "city" -> filtered.sort((a, b) -> {
+                    String cityA = a.getCity() != null ? a.getCity().getName() : "";
+                    String cityB = b.getCity() != null ? b.getCity().getName() : "";
+                    return cityA.compareToIgnoreCase(cityB);
+                });
                 case "gender" -> filtered.sort((a, b) -> a.getGender().compareToIgnoreCase(b.getGender()));
             }
         }
         return filtered;
     }
 
-    public void save(Person person) {
-        if (person.getId() == null) {
-            person.setId(nextId++);
-            persons.add(person);
-        } else {
-            update(person);
-        }
+    @Transactional
+    public Person save(Person person) {
+        return personRepository.save(person);
     }
 
-    public void update(Person person) {
-        Person existing = persons.stream()
-                .filter(p -> p.getId().equals(person.getId()))
-                .findFirst()
+    @Transactional
+    public Person update(Person person) {
+        Person existing = personRepository.findById(person.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Человек не найден"));
         existing.setName(person.getName());
         existing.setAge(person.getAge());
-        existing.setCity(person.getCity());
         existing.setGender(person.getGender());
+        if (person.getCity() != null) {
+            existing.setCity(person.getCity());
+        }
+        return personRepository.save(existing);
     }
 
-    public void delete(Long id) {
-        Person person = persons.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
+    @Transactional
+    public void delete(Long id) throws IllegalStateException {
+        Person person = personRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Человек не найден"));
-        persons.remove(person);
+        
+        // Проверка связей: нельзя удалить Person, если есть связанные House
+        if (!person.getHouses().isEmpty()) {
+            throw new IllegalStateException("Нельзя удалить человека, у которого есть дома. Сначала удалите или переназначьте дома.");
+        }
+        
+        personRepository.delete(person);
     }
 
+    @Transactional
     public void logicalDelete(Long id) {
-        Person person = persons.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Человек не найден"));
-        person.setDeleted(true);
+        personRepository.logicalDeleteById(id);
     }
 
+    @Transactional
     public void restore(Long id) {
-        Person person = persons.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Человек не найден"));
-        person.setDeleted(false);
+        personRepository.restoreById(id);
     }
 
+    @Transactional
     public void logicalDeleteAll(List<Long> ids) {
-        ids.forEach(this::logicalDelete);
+        personRepository.logicalDeleteMultiple(ids);
     }
 
-    public void deleteAll(List<Long> ids) {
-        ids.forEach(this::delete);
+    @Transactional
+    public void deleteAll(List<Long> ids) throws IllegalStateException {
+        for (Long id : ids) {
+            delete(id);
+        }
     }
 }

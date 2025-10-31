@@ -11,25 +11,25 @@ public class HomeController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
-        // If user has ROLE_USER -> houses
+        // USER -> persons (люди)
         boolean isUser = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_USER"));
         if (isUser) {
-            return "redirect:/houses";
+            return "redirect:/persons";
         }
-        // If manager -> persons
+        // MANAGER -> cities (города)
         boolean isManager = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"));
         if (isManager) {
-            return "redirect:/persons";
+            return "redirect:/cities";
         }
-        // If admin -> houses (admin can see everything)
+        // ADMIN -> houses (дома)
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) {
             return "redirect:/houses";
         }
         // Fallback
-        return "redirect:/houses";
+        return "redirect:/login";
     }
 }

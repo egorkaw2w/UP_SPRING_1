@@ -1,85 +1,163 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
     <title>Люди</title>
-    <link th:href="@{/css/style.css}" rel="stylesheet"/>
-</head>
-<body>
-<div class="container">
-    <h1>Список людей</h1>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <a th:href="@{/persons}" sec:authorize="hasRole('USER')">Люди</a>
+        <a th:href="@{/cities}" sec:authorize="hasRole('MANAGER')">Города</a>
+        <a th:href="@{/houses}" sec:authorize="hasRole('ADMIN')">Дома</a>
+        <span style="float: right">
+          <a th:href="@{/register}" sec:authorize="isAnonymous()"
+            >Регистрация</a
+          >
+          <a th:href="@{/login}" sec:authorize="isAnonymous()">Войти</a>
+          <span sec:authorize="isAuthenticated()">
+            <span th:text="${#authentication?.name}"></span>
+            &nbsp;|&nbsp;
+            <a th:href="@{/logout}">Выйти</a>
+          </span>
+        </span>
+      </div>
 
-    <div th:if="${message}" class="alert success" th:text="${message}"></div>
-    <div th:if="${error}" class="alert error" th:text="${error}"></div>
+      <h1>Список людей</h1>
 
-    <form method="get" class="form-group">
-        <input type="text" name="nameFilter" placeholder="Имя" th:value="${param.nameFilter}"/>
-        <input type="number" name="minAge" placeholder="Мин. возраст" th:value="${param.minAge}"/>
+      <div th:if="${message}" class="alert success" th:text="${message}"></div>
+      <div th:if="${error}" class="alert error" th:text="${error}"></div>
+
+      <form method="get" class="form-group">
+        <input
+          type="text"
+          name="nameFilter"
+          placeholder="Имя"
+          th:value="${param.nameFilter}"
+        />
+        <input
+          type="number"
+          name="minAge"
+          placeholder="Мин. возраст"
+          th:value="${param.minAge}"
+        />
         <select name="sortBy">
-            <option value="">Сортировка</option>
-            <option value="name" th:selected="${param.sortBy == 'name'}">По имени</option>
-            <option value="age" th:selected="${param.sortBy == 'age'}">По возрасту</option>
-            <option value="city" th:selected="${param.sortBy == 'city'}">По городу</option>
-            <option value="gender" th:selected="${param.sortBy == 'gender'}">По полу</option>
+          <option value="">Сортировка</option>
+          <option value="name" th:selected="${param.sortBy == 'name'}">
+            По имени
+          </option>
+          <option value="age" th:selected="${param.sortBy == 'age'}">
+            По возрасту
+          </option>
+          <option value="city" th:selected="${param.sortBy == 'city'}">
+            По городу
+          </option>
+          <option value="gender" th:selected="${param.sortBy == 'gender'}">
+            По полу
+          </option>
         </select>
         <button type="submit">Фильтр</button>
-    </form>
+      </form>
 
-    <form method="post" id="bulkForm">
+      <form method="post" id="bulkForm">
         <table>
-            <thead>
+          <thead>
             <tr>
-                <th><input type="checkbox" id="selectAll" onclick="toggleAll()"/></th>
-                <th>ID</th>
-                <th>Имя</th>
-                <th>Возраст</th>
-                <th>Город</th>
-                <th>Пол</th>
-                <th>Удалено</th>
-                <th>Действия</th>
+              <th>
+                <input type="checkbox" id="selectAll" onclick="toggleAll()" />
+              </th>
+              <th>ID</th>
+              <th>Имя</th>
+              <th>Возраст</th>
+              <th>Город</th>
+              <th>Пол</th>
+              <th>Удалено</th>
+              <th>Действия</th>
             </tr>
-            </thead>
-            <tbody>
-            <tr th:each="p : ${persons}" th:classappend="${p.deleted} ? 'deleted-row'">
-                <td><input type="checkbox" name="ids" th:value="${p.id}" class="select-checkbox"/></td>
-                <td th:text="${p.id}"></td>
-                <td th:text="${p.name}"></td>
-                <td th:text="${p.age}"></td>
-                <td th:text="${p.city}"></td>
-                <td th:text="${p.gender}"></td>
-                <td th:text="${p.deleted} ? 'Да' : 'Нет'"></td>
-                <td>
-                    <button type="submit" th:formaction="@{/persons/delete/{id}(id=${p.id})}" class="btn-delete">Физ.</button>
-                    <button type="submit" th:formaction="@{/persons/logical-delete/{id}(id=${p.id})}" class="btn-logical" th:unless="${p.deleted}">Лог.</button>
-                    <button type="submit"
-                            th:formaction="@{/persons/restore/{id}(id=${p.id})}"
-                            class="btn-restore"
-                            th:if="${p.deleted}">
-                        Восстановить
-                    </button>
-                </td>
+          </thead>
+          <tbody>
+            <tr
+              th:each="p : ${persons}"
+              th:classappend="${p.deleted} ? 'deleted-row'"
+            >
+              <td>
+                <input
+                  type="checkbox"
+                  name="ids"
+                  th:value="${p.id}"
+                  class="select-checkbox"
+                />
+              </td>
+              <td th:text="${p.id}"></td>
+              <td th:text="${p.name}"></td>
+              <td th:text="${p.age}"></td>
+              <td th:text="${p.city != null ? p.city.name : 'Не указан'}"></td>
+              <td th:text="${p.gender}"></td>
+              <td th:text="${p.deleted} ? 'Да' : 'Нет'"></td>
+              <td>
+                <button
+                  type="submit"
+                  th:formaction="@{/persons/delete/{id}(id=${p.id})}"
+                  class="btn-delete"
+                >
+                  Физ.
+                </button>
+                <button
+                  type="submit"
+                  th:formaction="@{/persons/logical-delete/{id}(id=${p.id})}"
+                  class="btn-logical"
+                  th:unless="${p.deleted}"
+                >
+                  Лог.
+                </button>
+                <button
+                  type="submit"
+                  th:formaction="@{/persons/restore/{id}(id=${p.id})}"
+                  class="btn-restore"
+                  th:if="${p.deleted}"
+                >
+                  Восстановить
+                </button>
+              </td>
             </tr>
-            </tbody>
+          </tbody>
         </table>
 
-        <div class="bulk-actions" th:if="${persons != null && !persons.isEmpty()}">
-            <button type="submit" th:formaction="@{/persons/logical-delete-multiple}" class="btn-logical-mass">
-                Логически удалить выбранные
-            </button>
-            <button type="submit" th:formaction="@{/persons/delete-multiple}" class="btn-delete-mass">
-                Физически удалить выбранные
-            </button>
+        <div
+          class="bulk-actions"
+          th:if="${persons != null && !persons.isEmpty()}"
+        >
+          <button
+            type="submit"
+            th:formaction="@{/persons/logical-delete-multiple}"
+            class="btn-logical-mass"
+          >
+            Логически удалить выбранные
+          </button>
+          <button
+            type="submit"
+            th:formaction="@{/persons/delete-multiple}"
+            class="btn-delete-mass"
+          >
+            Физически удалить выбранные
+          </button>
         </div>
-    </form>
+      </form>
 
-    <a th:href="@{/persons/add}" class="btn-add">Добавить человека</a>
-</div>
+      <a th:href="@{/persons/add}" class="btn-add">Добавить человека</a>
+    </div>
 
-<script>
-    function toggleAll() {
-        const checked = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-checkbox').forEach(cb => cb.checked = checked);
-    }
-</script>
-</body>
+    <script>
+      function toggleAll() {
+        const checked = document.getElementById("selectAll").checked;
+        document
+          .querySelectorAll(".select-checkbox")
+          .forEach((cb) => (cb.checked = checked));
+      }
+    </script>
+  </body>
 </html>

@@ -4,11 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -26,9 +29,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/register", "/login", "/error", "/h2-console/**").permitAll()
-                        .requestMatchers("/houses/**").hasAnyRole("USER", "MANAGER", "ADMIN")
-                        .requestMatchers("/persons/**", "/cities/**").hasAnyRole("MANAGER", "ADMIN")
-                        .requestMatchers("/notes/**", "/ownerships/**", "/users/**", "/roles/**").hasRole("ADMIN")
+                        .requestMatchers("/persons/**").hasRole("USER")
+                        .requestMatchers("/cities/**").hasRole("MANAGER")
+                        .requestMatchers("/houses/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
